@@ -1,0 +1,22 @@
+.question-title tr th{
+    padding: 0 !important;
+}
+
+.question-title tr th a{
+    display: block !important;
+    padding: 0.75rem !important;
+}
+
+.question-title tr th a:hover{
+    background-color: #eeeeee !important;
+}
+
+.question-detail h2{
+    border-bottom-style: dotted;
+    border-bottom-color: gray;
+}
+
+.question-detail h5{
+    border-bottom-style: dotted;
+    border-bottom-color: gray;
+}
