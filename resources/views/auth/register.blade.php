@@ -26,6 +26,10 @@
                 {!! Form::label('password_confirmation', 'パスワード（確認）：') !!}
                 {!! Form::password('password_confirmation', ['class' => 'form-control']) !!}
             </div>
+            
+            <div class="form-group">
+                {!! Form::submit('会員登録', ['class' => 'btn btn-primary btn-block']) !!}
+            </div>
         {!! Form::close() !!}
         
         <p>ログインは、{!! link_to_route('login', 'こちら') !!}</p>
