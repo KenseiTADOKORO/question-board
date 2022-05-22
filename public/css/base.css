@@ -11,12 +11,8 @@
     background-color: #eeeeee !important;
 }
 
-.question-detail h2{
-    border-bottom-style: dotted;
-    border-bottom-color: gray;
+.answer-form-border{
+    border-top-style: dotted !important;
+    border-top-color: gray !important;
 }
 
-.question-detail h5{
-    border-bottom-style: dotted;
-    border-bottom-color: gray;
-}
