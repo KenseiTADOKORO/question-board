@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Question;
+use App\Course;
+use App\Department;
+use App\University;
+use App\User;
 
 class QuestionsController extends Controller
 {
@@ -19,12 +23,26 @@ class QuestionsController extends Controller
         
         if(\Auth::check()) {
             $profile_user = \Auth::user();
-            
             $profile_user->loadRelationshipCounts();
             
-            $questions = Question::orderBy('created_at', 'desc')->get();
+            if($profile_user->course_id === null) {
+                $department = Department::findOrFail($profile_user->department_id);
+                $university = University::findOrFail($department->university_id);
+                
+                $questions = Question::orderBy('created_at', 'desc')->where('university_id', $university->id)->paginate(20);
+                
+                $data = ['profile_user' => $profile_user, 'questions' => $questions, 'department' => $department, 'university' => $university];
+            }
+            elseif($profile_user->course_id !== null) {
+                $course = Course::findOrFail($profile_user->course_id);
+                $department = Department::findOrFail($course->department_id);
+                $university = University::findOrFail($department->university_id);
+                
+                $questions = Question::orderBy('created_at', 'desc')->where('university_id', $university->id)->paginate(20);
+                
+                $data = ['profile_user' => $profile_user, 'questions' => $questions, 'course' => $course, 'department' => $department, 'university' => $university];
+            }
             
-            $data = ['profile_user' => $profile_user, 'questions' => $questions];
         }
         
         return view('welcome', $data);
@@ -35,9 +53,11 @@ class QuestionsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create($id)
     {
-        return view('questions.post_questions');
+        $user = User::findOrFail($id);
+        
+        return view('questions.post_questions', ['user' => $user]);
     }
 
     /**
@@ -52,7 +72,10 @@ class QuestionsController extends Controller
         
         $request->user()->questions()->create([
             'title' => $request->title,
-            'content' => $request->content
+            'content' => $request->content,
+            'course_id' => $request->course_id,
+            'department_id' => $request->department_id,
+            'university_id' => $request->university_id,
         ]);
         
         return redirect('/');
@@ -71,10 +94,25 @@ class QuestionsController extends Controller
         $user = $question->user;
         
         $profile_user = \Auth::user();
+        $profile_user->loadRelationshipCounts();
         
-        $answers = $question->answers;
+        $answers = $question->answers()->orderBy('created_at', 'desc')->paginate(10);
         
-        return view('questions.show', ['question' => $question, 'user' => $user, 'profile_user' => $profile_user, 'answers' => $answers]);
+        if($profile_user->course_id === null) {
+            $department = Department::findOrFail($profile_user->department_id);
+            $university = University::findOrFail($department->university_id);
+            
+            $data = ['user' => $user, 'profile_user' => $profile_user, 'question' => $question, 'answers' => $answers, 'department' => $department, 'university' => $university];
+        }
+        elseif($profile_user->course_id !== null) {
+            $course = Course::findOrFail($profile_user->course_id);
+            $department = Department::findOrFail($course->department_id);
+            $university = University::findOrFail($department->university_id);
+            
+            $data = ['user' => $user, 'profile_user' => $profile_user, 'question' => $question, 'answers' => $answers, 'course' => $course, 'department' => $department, 'university' => $university];
+        }
+        
+        return view('questions.show', $data);
     }
 
     /**

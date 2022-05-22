@@ -20,12 +20,12 @@
             </div>
         {!! Form::close() !!}
         
-        <div class="form-group">
-            {!! Form::open(['route' => ['questions.destroy', $question->id], 'method' => 'delete']) !!}
+        {!! Form::open(['route' => ['questions.destroy', $question->id], 'method' => 'delete']) !!}
+            <div class="form-group">
                 <div class="text-center">
                     {!! Form::submit('削除する', ['class' => 'btn btn-danger']) !!}
                 </div>
-            {!! Form::close() !!}
-        </div>
+            </div>
+        {!! Form::close() !!}
     </div>
 @endsection
