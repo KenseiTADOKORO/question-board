@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\User;
-
 use App\Answer;
 
 class AnswersController extends Controller
@@ -57,7 +56,21 @@ class AnswersController extends Controller
      */
     public function show($id)
     {
-        //
+        $my_answer = Answer::findOrFail($id);
+        $my_user = $my_answer->user;
+        
+        $question = $my_answer->question;
+        $question_user = $question->user;
+        
+        $answers = $question->answers()->where('user_id', '!=', $my_user->id)->orderBy('created_at', 'desc')->paginate(10);
+        
+        return view('answers.show', [
+            'question' => $question,
+            'question_user' => $question_user,
+            'my_answer' => $my_answer,
+            'my_user' => $my_user,
+            'answers' => $answers,
+        ]);
     }
 
     /**
@@ -68,7 +81,13 @@ class AnswersController extends Controller
      */
     public function edit($id)
     {
-        //
+        $answer = Answer::findOrFail($id);
+        
+        $question = $answer->question;
+        
+        $user = $question->user;
+        
+        return view('answers.edit', ['answer' => $answer, 'question' => $question, 'user' => $user]);
     }
 
     /**
@@ -80,7 +99,16 @@ class AnswersController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate(['content' => 'required']);
+        
+        $answer = Answer::findOrFail($id);
+        
+        if(\Auth::id() === $answer->user_id) {
+            $answer->content = $request->content;
+            $answer->save();
+        }
+        
+        return redirect(route('answers.show', ['answer' => $answer->id]));
     }
 
     /**
@@ -91,6 +119,14 @@ class AnswersController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $answer = Answer::findOrFail($id);
+        
+        $answer_id = $answer->id;
+        
+        if(\Auth::id() === $answer->user_id) {
+            $answer->delete();
+        }
+        
+        return redirect('/');
     }
 }
