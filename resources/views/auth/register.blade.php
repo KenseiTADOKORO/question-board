@@ -6,7 +6,7 @@
             <h2>会員登録</h2>
         </div>
         
-        {!! Form::open(['route' => 'signup.post']) !!}
+        {!! Form::open(['route' => 'signup.university']) !!}
             <div class="form-group">
                 {!! Form::label('name', '名前：') !!}
                 {!! Form::text('name', null, ['class' => 'form-control']) !!}
@@ -28,7 +28,7 @@
             </div>
             
             <div class="form-group">
-                {!! Form::submit('会員登録', ['class' => 'btn btn-primary btn-block']) !!}
+                {!! Form::submit('次へ', ['class' => 'btn btn-primary btn-block']) !!}
             </div>
         {!! Form::close() !!}
         

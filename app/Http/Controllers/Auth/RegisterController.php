@@ -9,6 +9,11 @@ use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
+use Illuminate\Http\Request;
+use App\University;
+use App\Department;
+use App\Course;
+
 class RegisterController extends Controller
 {
     /*
@@ -47,13 +52,25 @@ class RegisterController extends Controller
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected function validator(array $data)
+   protected function validator(array $data)
     {
-        return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
+        if(!empty($data['course'])) {
+            return Validator::make($data, [
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+                'password' => ['required', 'string', 'min:8', 'confirmed'],
+                'department_id' => ['required'],
+                'course' => ['required'],
+            ]);
+        }
+        elseif(empty($data['course'])) {
+            return Validator::make($data, [
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+                'password' => ['required', 'string', 'min:8', 'confirmed'],
+                'department_id' => ['required'],
+            ]);
+        }
     }
 
     /**
@@ -64,11 +81,50 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+        if(!empty($data['course'])) {
+            return User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+                'department_id' => $data['department_id'],
+                'course_id' => $data['course'],
+            ]);
+        }
+        elseif(empty($data['course'])) {
+            return User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+                'department_id' => $data['department_id'],
+            ]);
+        }
     }
     
+    public function showRegisterUniversityForm(Request $request) {
+        $user_information = $request->all();
+        
+        $universities = University::all();
+        
+        return view('auth.registerUniversity', ['user_information' => $user_information, 'universities' => $universities]);
+    }
+    
+    public function showRegisterDepartmentForm(Request $request) {
+        $user_information = $request->all();
+        
+        $id = $user_information['university'];
+        
+        $departments = Department::where('university_id', $id)->get();
+        
+        return view('auth.registerDepartment', ['user_information' => $user_information, 'departments' => $departments]);
+    }
+    
+    public function showRegisterCourseForm(Request $request) {
+        $user_information = $request->all();
+        
+        $id = $user_information['department'];
+        
+        $courses = Course::where('department_id', $id)->get();
+        
+        return view('auth.registerCourse', ['user_information' => $user_information, 'courses' => $courses]);
+    }
 }
