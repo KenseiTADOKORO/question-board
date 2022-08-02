@@ -87,7 +87,9 @@ class AnswersController extends Controller
         
         $user = $question->user;
         
-        return view('answers.edit', ['answer' => $answer, 'question' => $question, 'user' => $user]);
+        if(\Auth::id() === $answer->user_id) {
+            return view('answers.edit', ['answer' => $answer, 'question' => $question, 'user' => $user]);
+        }
     }
 
     /**

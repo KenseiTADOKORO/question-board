@@ -39,6 +39,12 @@
                     </div>
                 {!! Form::close() !!}
             </div>
+            
+            <div class="text-center mb-5">
+                {!! Form::open(['route' => ['users.destroy', $user->id], 'method' => 'delete']) !!}
+                    {!! Form::submit('退会する', ['class' => 'btn btn-danger']) !!}
+                {!! Form::close() !!}
+            </div>
         </div>
     </div>
 @endsection

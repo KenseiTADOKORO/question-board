@@ -107,7 +107,9 @@ class UsersController extends Controller
     public function edit($id) {
         $user = User::findOrFail($id);
         
-        return view('users.edit', ['user' => $user]);
+        if(\Auth::id() === $user->id) {
+            return view('users.edit', ['user' => $user]);
+        }
     }
     
     public function image(Request $request, $id) {
@@ -119,21 +121,35 @@ class UsersController extends Controller
         
         $path = Storage::disk('s3')->putFile('my_image', $image, 'public');
         
-        $user->image_path = Storage::disk('s3')->url($path);
-        
-        $user->save();
+        if(\Auth::id() === $user->id) {
+            $user->image_path = Storage::disk('s3')->url($path);
+            $user->save();
+        }
         
         return redirect()->route('users.edit', ['id' => $user->id]);
     }
     
     public function update(Request $request, $id) {
-        $request->validate(['name' => 'required|string|max:255', 'introduction' => 'string|max:200']);
+        $request->validate(['name' => 'required|string|max:255', 'introduction' => 'string|max:200|nullable']);
         
         $user = User::findOrFail($id);
-        $user->name = $request->name;
-        $user->introduction = $request->introduction;
-        $user->save();
+        
+        if(\Auth::id() === $user->id) {
+            $user->name = $request->name;
+            $user->introduction = $request->introduction;
+            $user->save();
+        }
         
         return redirect()->route('users.question', ['id' => $user->id]);
+    }
+    
+    public function destroy($id) {
+        $user = User::findOrFail($id);
+        
+        if(\Auth::id() === $user->id) {
+            $user->delete();
+        }
+        
+        return redirect('/');
     }
 }

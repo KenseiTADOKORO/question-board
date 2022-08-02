@@ -34,6 +34,7 @@ Route::group(['middleware' => ['auth']], function() {
         Route::post('image', 'UsersController@image')->name('users.image');
         Route::get('questionsList', 'UsersController@showQuestionsList')->name('users.question');
         Route::get('answersList', 'UsersController@showAnswersList')->name('users.answer');
+        Route::delete('destroy', 'UsersController@destroy')->name('users.destroy');
         
         Route::post('follow', 'UserFollowController@store')->name('user.follow');
         Route::delete('unfollow', 'UserFollowController@destroy')->name('user.unfollow');
